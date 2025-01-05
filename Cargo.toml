@@ -2,6 +2,9 @@
 name = "xClock"
 version = "0.1.0"
 edition = "2021"
+
 [dependencies]
+tui = "0.19"
+crossterm = "0.26"
 chrono = "0.4"
 
