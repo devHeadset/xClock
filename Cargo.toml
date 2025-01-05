@@ -7,4 +7,4 @@ edition = "2021"
 tui = "0.19"
 crossterm = "0.26"
 chrono = "0.4"
-
+figlet-rs = "0.1.5"

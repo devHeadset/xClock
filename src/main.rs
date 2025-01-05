@@ -1,11 +1,11 @@
 use chrono::Local;
+use figlet_rs::FIGfont;
 use std::{io, thread, time::Duration};
 use tui::{
     backend::{Backend, CrosstermBackend},
     layout::{Alignment, Constraint, Direction, Layout},
     style::{Color, Modifier, Style},
-    text::{Span, Spans},
-    widgets::{Block, Borders, Paragraph},
+    widgets::{Block, Paragraph},
     Terminal,
 };
 use crossterm::{
@@ -41,6 +41,15 @@ fn main() -> Result<(), io::Error> {
 }
 
 fn run_app<B: Backend>(terminal: &mut Terminal<B>) -> io::Result<()> {
+    // Load FIGfont for large text rendering
+    let standard_font = match FIGfont::standard() {
+        Ok(font) => font,
+        Err(e) => {
+            eprintln!("Failed to load standard font: {}", e);
+            return Err(io::Error::new(io::ErrorKind::NotFound, "Failed to load font"));
+        }
+    };
+
     loop {
         terminal.draw(|f| {
             let size = f.size();
@@ -74,17 +83,26 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>) -> io::Result<()> {
             let now = Local::now();
             let time_str = now.format("%H:%M:%S").to_string();
 
-            // Create a styled paragraph for the clock
-            let text = vec![Spans::from(Span::styled(
-                time_str,
-                Style::default()
-                    .fg(Color::Cyan)
-                    .add_modifier(Modifier::BOLD),
-            ))];
+            // Generate big ASCII text
+            let big_time = match standard_font.convert(&time_str) {
+                Some(time) => time,
+                None => {
+                    // Fallback if conversion fails
+                    eprintln!("Failed to convert time: '{}'", time_str);
+                    return;
+                }
+            };
 
-            let clock = Paragraph::new(text)
-                .block(Block::default().borders(Borders::ALL).title("Clock"))
-                .alignment(Alignment::Center);
+            // Create a styled paragraph for the clock, without the border
+            let text = vec![big_time.to_string()];
+            let clock = Paragraph::new(text.join("\n"))
+                .block(Block::default()) 
+                .alignment(Alignment::Center)
+                .style(
+                    Style::default()
+                        .fg(Color::Cyan)
+                        .add_modifier(Modifier::BOLD),
+                );
 
             f.render_widget(clock, inner_chunks[1]);
         })?;
@@ -101,3 +119,4 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>) -> io::Result<()> {
         thread::sleep(Duration::from_millis(100));
     }
 }
+

@@ -124,6 +124,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "figlet-rs"
+version = "0.1.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4742a071cd9694fc86f9fa1a08fa3e53d40cc899d7ee532295da2d085639fbc5"
+
+[[package]]
 name = "iana-time-zone"
 version = "0.1.61"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -572,5 +578,6 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "crossterm 0.26.1",
+ "figlet-rs",
  "tui",
 ]
