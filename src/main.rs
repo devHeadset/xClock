@@ -54,14 +54,20 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>) -> io::Result<()> {
         terminal.draw(|f| {
             let size = f.size();
 
-            // Create centered layout
+            // Dynamically calculate centered layout
+            let clock_height = 10; // Estimated height of the ASCII art clock
+            let clock_width = 60; // Estimated width of the ASCII art clock
+
+            let vertical_padding = (size.height.saturating_sub(clock_height)) / 2;
+            let horizontal_padding = (size.width.saturating_sub(clock_width)) / 2;
+
             let chunks = Layout::default()
                 .direction(Direction::Vertical)
                 .constraints(
                     [
-                        Constraint::Percentage(40),
-                        Constraint::Percentage(20),
-                        Constraint::Percentage(40),
+                        Constraint::Length(vertical_padding), // Top padding
+                        Constraint::Min(clock_height),       // Clock height
+                        Constraint::Length(vertical_padding), // Bottom padding
                     ]
                     .as_ref(),
                 )
@@ -71,9 +77,9 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>) -> io::Result<()> {
                 .direction(Direction::Horizontal)
                 .constraints(
                     [
-                        Constraint::Percentage(20),
-                        Constraint::Percentage(60),
-                        Constraint::Percentage(20),
+                        Constraint::Length(horizontal_padding), // Left padding
+                        Constraint::Min(clock_width),          // Clock width
+                        Constraint::Length(horizontal_padding), // Right padding
                     ]
                     .as_ref(),
                 )
@@ -93,10 +99,9 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>) -> io::Result<()> {
                 }
             };
 
-            // Create a styled paragraph for the clock, without the border
+            // Create a styled paragraph for the clock
             let text = vec![big_time.to_string()];
             let clock = Paragraph::new(text.join("\n"))
-                .block(Block::default()) 
                 .alignment(Alignment::Center)
                 .style(
                     Style::default()
